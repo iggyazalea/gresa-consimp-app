@@ -220,7 +220,7 @@ if "authenticated" not in st.session_state:
 
 # Password check
 if not st.session_state["authenticated"]:
-    password = st.text_input("Enter Access Key", type="password")
+    password = st.text_input("Enter Password", type="password")
 
     if password == "crhsshs123":   # ✅ test password (local only)
         st.session_state["authenticated"] = True
@@ -316,4 +316,5 @@ elif mode == "ConSimp Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
