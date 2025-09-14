@@ -76,7 +76,7 @@ Easy: Breaks down the concept in simple, bite-sized terms for beginners or quick
 
 Intermediate: Adds more details and examples for students who have some background and want deeper understanding.
 
-Complex: Gives a full, detailed explanation including nuances, technical terms, and advanced applications for students who want mastery.
+Advanced: Gives a full, detailed explanation including nuances, technical terms, and advanced applications for students who want mastery.
 
 Also add process questions for each level.
 """
@@ -292,22 +292,22 @@ elif mode == "ConSimp Mode":
                 - Provide a more detailed explanation with examples.
                 - Include 2–3 process questions for practice.
 
-                Complex:
+                Advanced:
                 - Provide a full, technical explanation with nuances and advanced applications.
                 - Include 3–5 process questions for practice.
 
                 Rules:
                 - Always include all three levels.
-                - Label clearly: Easy, Intermediate, Complex.
+                - Label clearly: Easy, Intermediate, Advanced.
                 - Use simple, clear language where appropriate.
                 """
 
                 response = ask_openai(consimp_prompt, mode="Teaching")
 
             # Display AI response in expanders for readability
-            levels = ["Easy", "Intermediate", "Complex"]
+            levels = ["Easy", "Intermediate", "Advanced"]
             for level in levels:
-                pattern = rf"{level}:(.*?)(?=Easy:|Intermediate:|Complex:|$)"
+                pattern = rf"{level}:(.*?)(?=Easy:|Intermediate:|Advanced:|$)"
                 match = re.search(pattern, response, re.DOTALL | re.IGNORECASE)
                 if match:
                     content = match.group(1).strip()
@@ -316,5 +316,6 @@ elif mode == "ConSimp Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
