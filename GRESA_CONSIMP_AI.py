@@ -163,32 +163,32 @@ def display_gresa_response(response_text):
                     for line in lines:
                         line = line.strip()
                         if line:
-                            display_lines.append(line)
+                            display_lines.append(f"{line}")
                             
                 elif sec == "Required:":
                     for line in lines:
                         line = line.strip()
                         if line:
-                            display_lines.append(line)
+                            display_lines.append(f"{line}")
                             
                 elif sec == "Equation:":
                     for line in lines:
                         line = line.strip()
                         if line:
-                            display_lines.append(line)
+                            display_lines.append(f"{line}")
 
                 elif sec == "Solution:":
                     # Keep AI's step numbering, don’t re-add
                     for line in lines:
                         line = line.strip()
                         if line:
-                            display_lines.append(line)
+                            display_lines.append(f"{line}")
 
                 elif sec == "A:":
                     for line in lines:
                         line = line.strip()
                         if line:
-                            display_lines.append(line)
+                            display_lines.append(f"**{line}**")
 
                 html_content = "<br>".join(display_lines)
                 st.markdown(
@@ -322,6 +322,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
