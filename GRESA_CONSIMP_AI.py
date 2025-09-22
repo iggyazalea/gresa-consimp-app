@@ -6,6 +6,7 @@ import re
 import os
 import platform
 import pytesseract
+import matplotlib.pyplot as plt  # 🔹 NEW (optional for programmatic diagrams)
 
 
 
@@ -98,6 +99,19 @@ def ask_openai(prompt, mode="Teaching"):
         return response.choices[0].message.content.strip()
     except Exception as e:
         return f"⚠️ Error: {e}"
+
+# 🔹 NEW FUNCTION: Generate Illustration with DALL·E
+def generate_illustration(problem_text):
+    try:
+        response = openai.images.generate(
+            model="gpt-image-1",  # DALL·E 3
+            prompt=f"Create a simple, clear, student-friendly illustration for this word problem:\n{problem_text}",
+            size="512x512"
+        )
+        image_url = response.data[0].url
+        return image_url
+    except Exception as e:
+        return f"⚠️ Error generating illustration: {e}"
 
 # ==============================
 # RESET FUNCTION
@@ -269,6 +283,14 @@ if mode == "GRESA Mode":
                 answer = ask_openai(prompt, mode="Teaching")
             st.success("Here’s the solution:")
             display_gresa_response(answer)
+
+        # 🔹 NEW: Generate Illustration
+            st.subheader("📷 Illustration")
+            img_url = generate_illustration(problem_text)
+            if img_url.startswith("http"):
+                st.image(img_url, caption="AI-generated illustration")
+            else:
+                st.warning(img_url)
         else:
             st.warning("Please enter a worded problem or upload an image of the worded problem first.")
 
@@ -322,6 +344,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
