@@ -6,7 +6,6 @@ import re
 import os
 import platform
 import pytesseract
-import matplotlib.pyplot as plt  # 🔹 NEW (optional for programmatic diagrams)
 
 
 
@@ -344,6 +343,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
