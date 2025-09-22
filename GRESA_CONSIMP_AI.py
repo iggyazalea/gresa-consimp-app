@@ -31,7 +31,7 @@ else:
 # ==============================
 # CONFIG
 # ==============================
-st.set_page_config(page_title="GRESA and ConSimp AI Tutor", page_icon="📘", layout="wide")
+st.set_page_config(page_title="GRECS-AI", page_icon="📘", layout="wide")
 
 # Set your OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -123,18 +123,18 @@ def extract_text_from_image(uploaded_file):
 
 def display_gresa_response(response_text):
     sections = {
-        "G:": "#cce5ff",  # blue
-        "R:": "#ffe5b4",  # orange
-        "E:": "#e6ccff",  # purple
-        "S:": "#fff3b0",  # yellow
-        "A:": "#d4edda"   # green
+        "Given:": "#cce5ff",  # blue
+        "Required:": "#ffe5b4",  # orange
+        "Equation:": "#e6ccff",  # purple
+        "Solution:": "#fff3b0",  # yellow
+        "Answer:": "#d4edda"   # green
     }
 
     # Remove LaTeX-like text
     clean_text = re.sub(r'(\\text\{.*?\}|\\approx|\\[a-zA-Z]+|\$+)', '', response_text)
 
     # Split into sections
-    pattern = r"(G:|R:|E:|S:|A:)"
+    pattern = r"(Given:|Required:|Equation:|Solution:|Answer:)"
     splits = re.split(pattern, clean_text)
 
     content_dict = {}
@@ -158,20 +158,20 @@ def display_gresa_response(response_text):
                 lines = content.split("\n")
                 display_lines = []
 
-                if sec in ["G:", "R:"]:
+                if sec in ["Given:", "Required:"]:
                     # Simple bullets
-                    for line in lines:
-                        line = line.strip()
-                        if line:
-                            display_lines.append(f"- {line}")
-
-                elif sec == "E:":
                     for line in lines:
                         line = line.strip()
                         if line:
                             display_lines.append(line)
 
-                elif sec == "S:":
+                elif sec == "Equation:":
+                    for line in lines:
+                        line = line.strip()
+                        if line:
+                            display_lines.append(line)
+
+                elif sec == "Solution:":
                     # Keep AI's step numbering, don’t re-add
                     for line in lines:
                         line = line.strip()
@@ -182,7 +182,7 @@ def display_gresa_response(response_text):
                     for line in lines:
                         line = line.strip()
                         if line:
-                            display_lines.append(f"**{line}**")
+                            display_lines.append(line)
 
                 html_content = "<br>".join(display_lines)
                 st.markdown(
@@ -232,10 +232,10 @@ if not st.session_state["authenticated"]:
     else:
         st.stop()  # 🚨 stop execution if nothing entered yet
 
-st.title("📘 GRESA and ConSimp AI")
-st.write("From word problems to tough concepts, **GRESA and ConSimp** have your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses ConSimp to simplify complex concepts from any subject into easy-to-understand ideas. ")
+st.title("📘 GRESA and Concept Simplifier AI")
+st.write("From word problems to tough concepts, **GRECS-AI** have your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses ConSimp to simplify complex concepts from any subject into easy-to-understand ideas. ")
 
-mode = st.sidebar.radio("Choose Mode:", ["GRESA Mode", "ConSimp Mode"])
+mode = st.sidebar.radio("Choose Mode:", ["GRESA Mode", "Concept Simplifier Mode"])
 
 # Refresh button in sidebar
 st.sidebar.button("🔄 Refresh / Clear Inputs", on_click=reset_session_state)
@@ -269,7 +269,7 @@ if mode == "GRESA Mode":
 # ==============================
 # Concept Simplifier Mode
 # ==============================
-elif mode == "ConSimp Mode":
+elif mode == "Concept Simplifier Mode":
     st.header("📚 Concept Simplifier Mode")
     st.write("Input a concept or topic (text or image). AI will provide explanations at three levels and process questions for each.")
 
@@ -316,6 +316,7 @@ elif mode == "ConSimp Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
