@@ -233,7 +233,7 @@ if not st.session_state["authenticated"]:
         st.stop()  # 🚨 stop execution if nothing entered yet
 
 st.title("📘 GRESA and Concept Simplifier AI")
-st.write("From word problems to tough concepts, **GRECS-AI** have your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses ConSimp to simplify complex concepts from any subject into easy-to-understand ideas. ")
+st.write("From word problems to tough concepts, **GRECS-AI** have your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses Concept Simplifier to explain complex concepts from any subject into easy-to-understand ideas. ")
 
 mode = st.sidebar.radio("Choose Mode:", ["GRESA Mode", "Concept Simplifier Mode"])
 
@@ -316,6 +316,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
