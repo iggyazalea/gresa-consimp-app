@@ -184,7 +184,7 @@ def display_gresa_response(response_text):
                         if line:
                             display_lines.append(f"{line}")
 
-                elif sec == "A:":
+                elif sec == "Answer:":
                     for line in lines:
                         line = line.strip()
                         if line:
@@ -322,6 +322,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
