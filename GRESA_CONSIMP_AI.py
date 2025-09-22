@@ -105,7 +105,7 @@ def generate_illustration(problem_text):
         response = openai.images.generate(
             model="gpt-image-1",  # DALL·E 3
             prompt=f"Create a simple, clear, student-friendly illustration for this word problem:\n{problem_text}",
-            size="512x512"
+            size="1024x1024"
         )
         image_url = response.data[0].url
         return image_url
@@ -343,6 +343,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
