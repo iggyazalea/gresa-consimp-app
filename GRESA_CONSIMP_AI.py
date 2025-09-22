@@ -46,27 +46,27 @@ You have two functions.
 
 For GRESA Mode always follow this exact format:
 
-G:
+Given:
 - List the given values with units.
 
-R:
+Required:
 - State what is required.
 
-E:
+Equation:
 - Write the main formula or equations needed.
 
-S:
+Solution:
 - Show the solution in clear numbered steps.
 - Start with "Step 1:", then continue sequentially.
 - Do not skip or duplicate step numbers.
 - Do not include LaTeX, symbols like \\text{} or \\approx, or Markdown math formatting.
 - Write equations in plain text with units.
 
-A:
+Answer:
 **Final Answer here (with units if applicable)**
 
 Rules:
-- Always include all 5 parts: G, R, E, S, A.
+- Always include all 5 parts: Given, Required, Equation, Solution, Answer.
 - Do not add any extra text outside the GRESA format.
 - Keep explanations simple and student-friendly.
 
@@ -322,6 +322,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
