@@ -158,13 +158,19 @@ def display_gresa_response(response_text):
                 lines = content.split("\n")
                 display_lines = []
 
-                if sec in ["Given:", "Required:"]:
+                if sec in "Given:":
                     # Simple bullets
                     for line in lines:
                         line = line.strip()
                         if line:
                             display_lines.append(line)
-
+                            
+                elif sec == "Required:":
+                    for line in lines:
+                        line = line.strip()
+                        if line:
+                            display_lines.append(line)
+                            
                 elif sec == "Equation:":
                     for line in lines:
                         line = line.strip()
@@ -316,6 +322,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
