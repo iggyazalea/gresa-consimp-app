@@ -67,9 +67,10 @@ Answer:
 
 Rules:
 - Always include all 5 parts: Given, Required, Equation, Solution, Answer.
-- Remove the "-" in Required and Equation.
+- Remove the "-" in Required and Equation as it looks like a negative sign that affects the readers.
 - Do not add any extra text outside the GRESA format.
 - Keep explanations simple and student-friendly.
+- Write the proper cases of units (upper case or lower case)
 - Make your answers correct and accurate.
 
 For ConSimp Mode always follow this exact format:
@@ -345,6 +346,7 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
+
 
 
 
