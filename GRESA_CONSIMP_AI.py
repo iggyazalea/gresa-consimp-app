@@ -7,10 +7,8 @@ import os
 import platform
 import pytesseract
 
-
-
-#pip install streamlit openai pillow pytesseract
-#streamlit run GRESA_CONSIMP_AI.py
+# pip install streamlit openai pillow pytesseract
+# streamlit run GRESA_CONSIMP_AI.py
 # ==============================
 # TESSERACT SETUP
 # ==============================
@@ -45,23 +43,18 @@ You have two functions.
 2. Concept Simplifier Mode: You are a Concept Simplifier that explains concepts into three levels, easy, intermediate and complex.
 
 For GRESA Mode always follow this exact format:
-
 Given:
 - List the given values with units.
-
 Required:
 - State what is required.
-
 Equation:
 - Write the main formula or equations needed.
-
 Solution:
 - Show the solution in clear numbered steps.
 - Start with "Step 1:", then continue sequentially.
 - Do not skip or duplicate step numbers.
 - Do not include LaTeX, symbols like \\text{} or \\approx, or Markdown math formatting.
 - Write equations in plain text with units.
-
 Answer:
 **Final Answer here (complete answer with the quantity and units if applicable, example: Time = 2 seconds )**
 
@@ -73,8 +66,8 @@ Rules:
 - Write the proper cases of units (upper case or lower case)
 - Make your answers correct and accurate.
 
-For ConSimp Mode always follow this exact format:
-1. Provide three level of explanation for a concept in:
+For Concept Simplifier  Mode always follow this exact format:
+1. Provide three level of explanation for a concept with regards to the encoded MELCS in:
 Easy: Breaks down the concept in simple, bite-sized terms for beginners or quick understanding.
 
 Intermediate: Adds more details and examples for students who have some background and want deeper understanding.
@@ -83,6 +76,7 @@ Advanced: Gives a full, detailed explanation including nuances, technical terms,
 
 Also add process questions for each level.
 """
+
 
 # ==============================
 # FUNCTIONS
@@ -102,32 +96,34 @@ def ask_openai(prompt, mode="Teaching"):
     except Exception as e:
         return f"⚠️ Error: {e}"
 
+
 # 🔹 NEW FUNCTION: Generate Illustration with DALL·E
-#def generate_illustration(problem_text):
+# def generate_illustration(problem_text):
 #    try:
 #        response = openai.images.generate(
 #            model="gpt-image-1",  # DALL·E 3
- #           prompt=f"Create a simple, clear, student-friendly illustration for this word problem:\n{problem_text}",
-  #          size="1024x1024"
-   #     )
-    #    image_url = response.data[0].url
-     #   return image_url
-    #except Exception as e:
-     #   return f"⚠️ Error generating illustration: {e}"
+#           prompt=f"Create a simple, clear, student-friendly illustration for this word problem:\n{problem_text}",
+#          size="1024x1024"
+#     )
+#    image_url = response.data[0].url
+#   return image_url
+# except Exception as e:
+#   return f"⚠️ Error generating illustration: {e}"
 
 # ==============================
 # RESET FUNCTION
 # ==============================
 def reset_session_state():
     # Clear text inputs
-    for key in ["problem_text", "student_solution", "concept_text"]:
+    for key in ["problem_text", "concept_text"]:
         if key in st.session_state:
             st.session_state[key] = ""
 
     # Clear uploaded files
-    for key in ["uploaded_problem_file", "uploaded_student_file", "uploaded_concept_file"]:
+    for key in ["uploaded_problem_file", "uploaded_concept_file"]:
         if key in st.session_state:
             st.session_state[key] = None
+
 
 def extract_text_from_image(uploaded_file):
     try:
@@ -143,7 +139,7 @@ def display_gresa_response(response_text):
         "Required:": "#ffe5b4",  # orange
         "Equation:": "#e6ccff",  # purple
         "Solution:": "#fff3b0",  # yellow
-        "Answer:": "#d4edda"   # green
+        "Answer:": "#d4edda"  # green
     }
 
     # Remove LaTeX-like text
@@ -180,13 +176,13 @@ def display_gresa_response(response_text):
                         line = line.strip()
                         if line:
                             display_lines.append(f"{line}")
-                            
+
                 elif sec == "Required:":
                     for line in lines:
                         line = line.strip()
                         if line:
                             display_lines.append(f"{line}")
-                            
+
                 elif sec == "Equation:":
                     for line in lines:
                         line = line.strip()
@@ -244,7 +240,7 @@ if "authenticated" not in st.session_state:
 if not st.session_state["authenticated"]:
     password = st.text_input("Enter Password", type="password")
 
-    if password == "crhsshs123":   # ✅ test password (local only)
+    if password == "crhsshs123":  # ✅ test password (local only)
         st.session_state["authenticated"] = True
         st.success("Access Granted ✅")
         st.rerun()
@@ -255,7 +251,8 @@ if not st.session_state["authenticated"]:
         st.stop()  # 🚨 stop execution if nothing entered yet
 
 st.title("📘 GRESA and Concept Simplifier AI")
-st.write("From word problems to tough concepts, **GRECS-AI** have your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses Concept Simplifier to explain complex concepts from any subject into easy-to-understand ideas. ")
+st.write(
+    "From word problems to tough concepts, **GRECS-AI** have your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses Concept Simplifier to explain complex concepts from any subject into easy-to-understand ideas. ")
 
 mode = st.sidebar.radio("Choose Mode:", ["GRESA Mode", "Concept Simplifier Mode"])
 
@@ -286,13 +283,6 @@ if mode == "GRESA Mode":
             st.success("Here’s the solution:")
             display_gresa_response(answer)
 
-        # 🔹 NEW: Generate Illustration
-       #     st.subheader("📷 Illustration")
-         #   img_url = generate_illustration(problem_text)
-         #   if img_url.startswith("http"):
-         #       st.image(img_url, caption="AI-generated illustration")
-        #    else:
-        #        st.warning(img_url)
         else:
             st.warning("Please enter a worded problem or upload an image of the worded problem first.")
 
@@ -301,30 +291,35 @@ if mode == "GRESA Mode":
 # ==============================
 elif mode == "Concept Simplifier Mode":
     st.header("📚 Concept Simplifier Mode")
-    st.write("Input a concept or topic (text or image). AI will provide explanations at three levels and process questions for each.")
+    st.write(
+        "Input a concept or topic (text or image). AI will provide explanations at three levels and process questions for each.")
 
     # Step 1: Get concept/topic input
-    concept_text = get_problem_input("Enter the concept or topic here:")
+    concept_text = get_problem_input("Enter the concept/topic and MELCs here:")
 
     if st.button("Simplify Concept"):
         if concept_text.strip():
             with st.spinner("Generating explanations..."):
                 consimp_prompt = f"""
-                You are a teacher explaining concepts in three levels. Follow this exact format:
+                You are a teacher explaining concepts in three levels and you answer accordingly based on the given MELCs. 
+                If no MELCs is given, just explain the concept in three levels. Follow this exact format:
 
                 Concept/Topic: {concept_text}
 
                 Easy:
-                - Provide a simple, bite-sized explanation for beginners.
-                - Include 1–2 process questions for practice.
+                - Provide a simple, bite-sized explanation for students with beginner level.
+                - Include 5 process questions for practice.
+                
 
                 Intermediate:
-                - Provide a more detailed explanation with examples.
-                - Include 2–3 process questions for practice.
+                - Provide a more detailed explanation with examples for average students.
+                - Include 5 process questions for practice.
+                
 
                 Advanced:
-                - Provide a full, technical explanation with nuances and advanced applications.
-                - Include 3–5 process questions for practice.
+                - Provide a full, technical explanation with nuances and advanced applications for advanced students.
+                - Include 5 process questions for practice.
+                
 
                 Rules:
                 - Always include all three levels.
@@ -346,18 +341,6 @@ elif mode == "Concept Simplifier Mode":
                             st.markdown(content)
         else:
             st.warning("Please enter a concept or topic first.")
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
