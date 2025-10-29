@@ -28,6 +28,7 @@ else:
 st.set_page_config(page_title="GRECS-AI", page_icon="📘", layout="wide")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+
 # ==============================
 # FUNCTIONS
 # ==============================
@@ -44,18 +45,26 @@ def ask_openai(prompt):
     except Exception as e:
         return f"⚠️ Error: {e}"
 
+
 def reset_session_state():
     """Clears session state inputs"""
     for key in ["problem_text", "concept_text", "uploaded_problem_file"]:
         st.session_state[key] = ""
 
+
 def extract_text_from_image(uploaded_file):
     """Extracts text using OCR"""
     try:
         image = Image.open(uploaded_file)
-        return pytesseract.image_to_string(image)
+        text = pytesseract.image_to_string(image)
+        if not text.strip():
+            st.warning(
+                "⚠️ No text could be extracted from the image. Please check the image quality or type a problem manually.")
+        return text
     except Exception as e:
-        return f"⚠️ OCR Error: {e}"
+        st.error(f"⚠️ OCR Error: {e}")
+        return ""
+
 
 def display_gresa_response(response_text):
     """Formats and displays GRESA response"""
@@ -87,6 +96,7 @@ def display_gresa_response(response_text):
                     unsafe_allow_html=True
                 )
 
+
 def get_problem_input(label_text="Enter your problem:"):
     """Handles text or image input for problems/concepts"""
     if 'problem_text' not in st.session_state:
@@ -99,13 +109,43 @@ def get_problem_input(label_text="Enter your problem:"):
         uploaded_file = st.file_uploader("📸 Or upload an image", type=["png", "jpg", "jpeg"])
         if uploaded_file:
             extracted_text = extract_text_from_image(uploaded_file)
-            st.write("📖 Extracted Text:")
-            st.code(extracted_text)
-            if not text_input.strip():
-                text_input = extracted_text
+            if extracted_text.strip():
+                st.write("📖 Extracted Text:")
+                st.code(extracted_text)
+                if not text_input.strip():
+                    text_input = extracted_text
 
     st.session_state.problem_text = text_input
     return text_input
+
+
+# ==============================
+# INPUT VALIDATION FUNCTIONS
+# ==============================
+def is_valid_problem(text):
+    """Check if the input resembles a worded problem."""
+    if not text.strip():
+        return False
+    if len(text.strip()) < 15:
+        return False
+    keywords = ["calculate", "find", "determine", "how much", "what is", "solve", "add", "subtract",
+                "multiply", "divide"]
+    if not any(k.lower() in text.lower() for k in keywords):
+        return False
+    return True
+
+
+def is_valid_concept(text):
+    """Check if the input length falls within a typical concept/topic range."""
+    stripped = text.strip()
+    word_count = len(stripped.split())
+
+    # Set acceptable word range for concepts/topics
+    if 1 <= word_count <= 10:
+        return True
+    else:
+        return False
+
 
 # ==============================
 # LOGIN SYSTEM
@@ -128,7 +168,8 @@ if not st.session_state["authenticated"]:
 # ==============================
 st.title("📘 GRESA and Concept Simplifier AI")
 st.write(
-    "From word problems to tough concepts, **GRECS-AI** have your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses Concept Simplifier to explain complex concepts from any subject into easy-to-understand ideas. ")
+    "From word problems to tough concepts, **GRECS-AI** has your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses Concept Simplifier to explain complex concepts from any subject into easy-to-understand ideas."
+)
 
 mode = st.sidebar.radio("Choose Mode:", ["GRESA Mode", "Concept Simplifier Mode"])
 st.sidebar.button("🔄 Refresh / Clear Inputs", on_click=reset_session_state)
@@ -139,8 +180,11 @@ st.sidebar.button("🔄 Refresh / Clear Inputs", on_click=reset_session_state)
 if mode == "GRESA Mode":
     st.header("👨‍🏫 GRESA Mode")
     problem_text = get_problem_input("Enter your worded problem:")
+
     if st.button("Solve with GRESA"):
-        if problem_text.strip():
+        if not is_valid_problem(problem_text):
+            st.error("⚠️ Please enter a proper worded problem. It seems your input is incomplete or invalid.")
+        else:
             with st.spinner("Solving using GRESA..."):
                 prompt = f"""
                 Solve this problem step-by-step using the GRESA method.
@@ -182,17 +226,15 @@ if mode == "GRESA Mode":
                 - Keep explanations clear and concise; avoid extra commentary.
                 - Always include all five labeled sections exactly as above: Given, Required, Equation, Solution, Answer.
 
-
                 Problem: {problem_text}"""
                 answer = ask_openai(prompt)
+
             st.success("Here’s the solution:")
             display_gresa_response(answer)
 
-            # --- Download button for GRESA Mode (includes problem) ---
+            # --- Download button ---
             safe_title = re.sub(r'[^A-Za-z0-9]+', '_', problem_text.strip())[:30] or "Problem"
             filename = f"GRECS-AI_GRESA_{safe_title}.txt"
-
-            # Combine problem and answer in one text file
             full_text = f"Problem:\n{problem_text.strip()}\n\nGRESA Solution:\n{answer.strip()}"
 
             st.download_button(
@@ -202,11 +244,6 @@ if mode == "GRESA Mode":
                 mime="text/plain"
             )
 
-        else:
-            st.warning("Please input a problem or upload an image first.")
-
-
-
 # ==============================
 # CONCEPT SIMPLIFIER MODE
 # ==============================
@@ -215,7 +252,9 @@ else:
     concept_text = get_problem_input("Enter the concept/topic and MELCs here:")
 
     if st.button("Simplify Concept"):
-        if concept_text.strip():
+        if not is_valid_concept(concept_text):
+            st.error("⚠️ Please enter a valid concept or topic. It seems your input is empty or invalid.")
+        else:
             with st.spinner("Simplifying the concept..."):
                 prompt = f"""
                 You are a teacher explaining concepts in three levels and you answer accordingly based on the given MELCs. 
@@ -226,11 +265,11 @@ else:
                 Easy:
                 - Provide a simple, bite-sized explanation for students with beginner level.
                 - Include 5 process questions for practice.
-                
+
                 Intermediate:
                 - Provide a more detailed explanation with examples for average students.
                 - Include 5 process questions for practice.
-                
+
                 Advanced:
                 - Provide a full, technical explanation with examples, nuances and advanced applications for advanced students.
                 - Include 5 process questions for practice.
@@ -255,7 +294,7 @@ else:
                     with st.expander(f"**{level} Explanation**"):
                         st.markdown(match.group(1).strip())
 
-            # --- Download button for Concept Simplifier Mode ---
+            # --- Download button ---
             safe_title = re.sub(r'[^A-Za-z0-9]+', '_', concept_text.strip())[:30] or "Concept"
             filename = f"GRECS-AI_Simplified_{safe_title}.txt"
 
@@ -265,8 +304,3 @@ else:
                 file_name=filename,
                 mime="text/plain"
             )
-
-        else:
-            st.warning("Please enter a concept or upload an image first.")
-
-
