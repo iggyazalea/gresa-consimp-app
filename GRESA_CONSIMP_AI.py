@@ -5,6 +5,7 @@ import re
 import os
 import platform
 import pytesseract
+from datetime import datetime
 
 # ==============================
 # TESSERACT SETUP
@@ -39,7 +40,8 @@ def ask_openai(prompt):
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
-            max_tokens=800
+            max_tokens=600,
+            timeout = 30
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
@@ -119,9 +121,6 @@ def get_problem_input(label_text="Enter your problem:"):
     return text_input
 
 
-# ==============================
-# INPUT VALIDATION FUNCTIONS
-# ==============================
 def is_valid_problem(text):
     """Check if the input resembles a worded problem."""
     if not text.strip():
@@ -164,6 +163,42 @@ if not st.session_state["authenticated"]:
     st.stop()
 
 # ==============================
+# HISTORY SYSTEM
+# ==============================
+if "history" not in st.session_state:
+    st.session_state["history"] = []
+
+def add_to_history(mode, input_text, response):
+    entry = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "mode": mode,
+        "input": input_text.strip(),
+        "response": response.strip()
+    }
+    st.session_state["history"].insert(0, entry)
+
+def show_history():
+    st.header("🕘 Session History")
+    if not st.session_state["history"]:
+        st.info("No history yet. Try solving or simplifying something first!")
+        return
+
+    for i, h in enumerate(st.session_state["history"], start=1):
+        with st.expander(f"{i}. [{h['mode']}] - {h['timestamp']}"):
+            st.markdown(f"**Input:**\n\n{h['input']}")
+            st.markdown("---")
+            st.markdown(f"**Response:**\n\n{h['response']}")
+            filename = f"GRECS-AI_{h['mode']}_{i}.txt"
+            text_data = f"Mode: {h['mode']}\nDate: {h['timestamp']}\n\nInput:\n{h['input']}\n\nResponse:\n{h['response']}"
+            st.download_button(
+                label="📥 Download This Entry",
+                data=text_data.encode("utf-8"),
+                file_name=filename,
+                mime="text/plain"
+            )
+
+
+# ==============================
 # APP INTERFACE
 # ==============================
 st.title("📘 GRESA and Concept Simplifier AI")
@@ -171,8 +206,15 @@ st.write(
     "From word problems to tough concepts, **GRECS-AI** has your back. This AI-powered study tool solves Math and Science word problems with the GRESA method and uses Concept Simplifier to explain complex concepts from any subject into easy-to-understand ideas."
 )
 
-mode = st.sidebar.radio("Choose Mode:", ["GRESA Mode", "Concept Simplifier Mode"])
+mode = st.sidebar.radio("Choose Mode:", ["GRESA Mode", "Concept Simplifier Mode", "View History"])
 st.sidebar.button("🔄 Refresh / Clear Inputs", on_click=reset_session_state)
+
+# ==============================
+# HISTORY VIEW
+# ==============================
+if mode == "View History":
+    show_history()
+    st.stop()
 
 # ==============================
 # GRESA MODE
@@ -231,8 +273,8 @@ if mode == "GRESA Mode":
 
             st.success("Here’s the solution:")
             display_gresa_response(answer)
+            add_to_history("GRESA", problem_text, answer)
 
-            # --- Download button ---
             safe_title = re.sub(r'[^A-Za-z0-9]+', '_', problem_text.strip())[:30] or "Problem"
             filename = f"GRECS-AI_GRESA_{safe_title}.txt"
             full_text = f"Problem:\n{problem_text.strip()}\n\nGRESA Solution:\n{answer.strip()}"
@@ -260,7 +302,7 @@ else:
                 You are a teacher explaining concepts in three levels and you answer accordingly based on the given MELCs. 
                 If no MELCs is given, just explain the concept in three levels. Follow this exact format:
 
-                Concept/Topic: {concept_text}
+                Concept or Topic: {concept_text}
 
                 Easy:
                 - Provide a simple, bite-sized explanation for students with beginner level.
@@ -294,7 +336,8 @@ else:
                     with st.expander(f"**{level} Explanation**"):
                         st.markdown(match.group(1).strip())
 
-            # --- Download button ---
+            add_to_history("Concept Simplifier", concept_text, response)
+
             safe_title = re.sub(r'[^A-Za-z0-9]+', '_', concept_text.strip())[:30] or "Concept"
             filename = f"GRECS-AI_Simplified_{safe_title}.txt"
 
