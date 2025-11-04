@@ -122,17 +122,30 @@ def get_problem_input(label_text="Enter your problem:"):
 
 
 def is_valid_problem(text):
-    """Check if the input resembles a worded problem."""
-    if not text.strip():
+    """Check if the input resembles a numerical or science-based word problem."""
+    text = text.strip()
+    if not text:
         return False
-    if len(text.strip()) < 15:
+    if len(text) < 15:
         return False
-    keywords = ["calculate", "find", "determine", "how much", "what is", "solve", "add", "subtract",
-                "multiply", "divide"]
-    if not any(k.lower() in text.lower() for k in keywords):
-        return False
-    return True
 
+    # Check if there is at least one question mark
+    has_question = "?" in text
+
+    # Check if there are any numbers (integer or decimal)
+    has_number = bool(re.search(r'\d+(\.\d+)?', text))
+
+    # Check if there are possible measurement units (common in physics/math)
+    units = [
+        "m", "cm", "mm", "km", "kg", "g", "s", "N", "J", "W", "A", "V", "Ω", "ohm", 
+        "Hz", "°C", "K", "mol", "Pa", "L", "m/s", "m/s²", "N·m", "J/kg"
+    ]
+    has_unit = any(re.search(rf'\b{unit}\b', text) for unit in units)
+
+    # It's valid if it looks like a question and has numbers or units
+    if has_question and (has_number or has_unit):
+        return True
+    return False
 
 def is_valid_concept(text):
     """Check if the input length falls within a typical concept/topic range."""
@@ -347,3 +360,4 @@ else:
                 file_name=filename,
                 mime="text/plain"
             )
+
