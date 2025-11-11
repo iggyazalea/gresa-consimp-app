@@ -137,7 +137,7 @@ def is_valid_problem(text):
 
     # Check if there are possible measurement units (common in physics/math)
     units = [
-        "m", "cm", "mm", "km", "kg", "g", "s", "N", "J", "W", "A", "V", "Ω", "ohm", 
+        "m", "cm", "mm", "km", "kg", "g", "s", "N", "J", "W", "A", "V", "Ω", "ohm",
         "Hz", "°C", "K", "mol", "Pa", "L", "m/s", "m/s²", "N·m", "J/kg"
     ]
     has_unit = any(re.search(rf'\b{unit}\b', text) for unit in units)
@@ -158,14 +158,60 @@ def is_valid_concept(text):
     else:
         return False
 
-
 # ==============================
-# LOGIN SYSTEM
+# LOGIN SYSTEM WITH USER GUIDE (SHOWS ONLY BEFORE LOGIN)
 # ==============================
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 
 if not st.session_state["authenticated"]:
+    # --- Show welcome message and guide (only before login) ---
+    st.markdown("""
+    # 📘 Welcome to GRECS-AI
+    ### Hi there! First time using **GRECS-AI**? Click the **expanders** below for your complete guide.
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    with st.expander("🔒 1️⃣ Authentication"):
+        st.markdown("""
+        - Enter the password below to access the app.
+        - Only authorized users can use GRECS-AI.
+        """)
+
+    with st.expander("🧮 2️⃣ GRESA Mode (Word Problem Solver)"):
+        st.markdown("""
+        - Solve word problems step-by-step using the **GRESA method**.
+        - You can **type** or **upload** a problem image.
+        - The AI provides:
+            - **Given**, **Required**, **Equation**, **Solution**, **Answer**
+        - Download the solution as a text file.
+        """)
+
+    with st.expander("📚 3️⃣ Concept Simplifier Mode"):
+        st.markdown("""
+        - Simplify topics into **Easy**, **Intermediate**, and **Advanced** explanations.
+        - You can **type** or **upload** a topic image.
+        - Add MELCs (optional).
+        - Each level includes five process questions.
+        """)
+
+    with st.expander("🕘 4️⃣ View History"):
+        st.markdown("""
+        - Review past problems and concepts.
+        - Expand entries to view details or download them.
+        """)
+
+    with st.expander("💡 5️⃣ Tips for Best Results"):
+        st.markdown("""
+        - Include numbers and units in word problems.
+        - Make sure images are clear for extraction.
+        - Keep topics short (1–10 words).
+        """)
+
+    st.markdown("---")
+
+    # --- Password input ---
     password = st.text_input("Enter Password", type="password")
     if password == "crhsshs123":
         st.session_state["authenticated"] = True
@@ -360,4 +406,3 @@ else:
                 file_name=filename,
                 mime="text/plain"
             )
-
