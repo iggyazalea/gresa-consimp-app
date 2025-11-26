@@ -143,7 +143,7 @@ def is_valid_problem(text):
     has_unit = any(re.search(rf'\b{unit}\b', text) for unit in units)
 
     # It's valid if it looks like a question and has numbers or units
-    if has_question and (has_number or has_unit):
+    if has_question or (has_number or has_unit):
         return True
     return False
 
@@ -406,3 +406,4 @@ else:
                 file_name=filename,
                 mime="text/plain"
             )
+
